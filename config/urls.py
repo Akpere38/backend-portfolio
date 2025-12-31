@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import get_user_model
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +30,13 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
+
+if os.getenv("CREATE_SUPERUSER") == "True":
+    User = get_user_model()
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser(
+            username="admin",
+            email="",
+            password=os.getenv("DJANGO_SUPERUSER_PASSWORD", "admin123")
+        )
